@@ -7,11 +7,10 @@
 
 <script>
 export default {
-  setup(){
+  setup(props, context){
     const clearAllMemo = () =>{
-      // localstorage에서 전체내용 삭제
-      // 추후 DB 연동 예정
-      localStorage.clear();
+
+      context.emit('deleteitem')
     }
 
     return{

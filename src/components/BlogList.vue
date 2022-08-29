@@ -3,56 +3,34 @@
   <div class="list-wrap">
 <ul>
   <!-- v-for in :key -->
-  <li v-for="(item, index) in memoItemArr" :key="index" class="shadow"> 
-    <i class="fas fa-check-circle check-bt" @click="updateMemo(item)" :class="{memocomp:item.complete}"></i>
+  <li v-for="(item, index) in memodata" :key="index" class="shadow"> 
+    <i class="fas fa-check-circle check-bt" @click="updateMemo(item, index)" :class="{memocomp:item.complete}"></i>
     <span :class="{memocomptxt:item.complete}">{{item.memotitle}}</span> 
+    <div class="info">
+<span class="icon" :style="{backgroundImage:'url(' + require(`@/assets/images/${item.memoicon}`) + ')'}"></span>
+    <span class="date">{{item.memodate}}</span>
     <span class="remove-bt" @click="removeMemo(item.id, index)">
       <i class="fas fa-trash-alt"></i>
     </span>
+    </div>
   </li>
 </ul>
   </div>
 </template>
 
 <script>
-import {ref, reactive} from 'vue';
 export default {
-setup(){
-  // localstorage의 목록을 가지고온다.
-  const total = ref(0);
-  total.value = localStorage.length;
-  // 키네임을 저장하는 배열
-  const memoItemArr = reactive([]);
+  props:['memodata'],
+setup(props, context){
 
-
-  if(localStorage.length > 0){
-    for(let i = 0; i < total.value; i++){
-      // 배열에 요소를 밀어넣는다.
-      // key값도 필요하지만, 내용(값)이 필요함.
-      // 추후 db 연동 예정
-      let obj = localStorage.getItem(localStorage.key(i));
-      memoItemArr.push(JSON.parse(obj))
-      // 키 값을 이용해서 정렬하기(오름차순)
-      memoItemArr.sort();
-    }
+  const removeMemo = (item,index)=>{
+    context.emit('removeitem',item,index)
   }
-  const removeMemo = (item, index)=>{
-    // localStorage 에서 key를 통해서 지운다.
-    localStorage.removeItem(item);
-    // 배열(memoItempArr) 에서도 지운다.
-    memoItemArr.splice(index, 1)
-  }
-  const updateMemo = (item)=>{
-    // localstorage 에서는 update 메소드를 지원하지 않는다.
-    // 찾아서 지우고, 
-    localStorage.removeItem(item.id);
-    // 변경한다.
-    item.complete = !item.complete;
-    //다시 set 한다.
-    localStorage.setItem(item.id , JSON.stringify(item));
+  const updateMemo = (item,index)=>{
+    context.emit('updateitem', item, index)
   }
   return{
-    memoItemArr,removeMemo,updateMemo
+    removeMemo,updateMemo
   }
 }
 }
@@ -69,9 +47,21 @@ li {
   border-radius: 5px;
   padding: 0 20px;
 }
-
-.remove-bt{
+.info {
   margin-left: auto;
+}
+.icon{
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+}
+.remove-bt{
+  margin-left: 10px;
   cursor: pointer;
   color: hotpink;
 }
@@ -93,4 +83,5 @@ span i{
   color: #ddd;
   text-decoration: line-through;
 }
+
 </style>

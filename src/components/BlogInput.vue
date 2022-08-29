@@ -1,33 +1,32 @@
 <template>
   <div class="input-wrap shadow">
     <input type="text" v-model="newItem" class="input-box" maxlength="30" @keyup.enter="addItem">
+    <div class="option">
+    <span @click="addIcon(0)" class="img1">
+      이미지1
+    </span>
+    <span @click="addIcon(1)" class="img2">
+      이미지2
+    </span>
+    <span @click="addIcon(2)" class="img3">
+      이미지3
+    </span>
     <span @click="addItem" class="add-bt">
       <i class="fas fa-plus add-bt-icon"></i>
     </span>
+    </div>
   </div>
 </template>
 
 <script>
 import {ref} from 'vue';
 export default {
-  setup() {
+  setup(props, context) {
     const newItem = ref('');
-    // 현재 시간값을 계산해서 중복이 되지 않는 값을 처리한다.
-    // key 와 id를 생성해 주기 위해서 처리
-              // 10보다 작은 값에 0을 붙임
-          const addZero = (n) => {
-            return n < 10 ? '0' + n : n;
-          }
-          // 현재 시간을 리턴
-          const getCurrentDate = () => {
-            let date = new Date();
-            return date.getFullYear().toString() + addZero(date.getMonth() + 1) + addZero(date.getDate()) +
-              addZero(date.getHours()) + addZero(date.getMinutes()) + addZero(date.getSeconds());              
-          }
-
-
+    const newIcon = ref(0);
     const addItem = () => {  
       let temp = newItem.value;
+      let icon = newIcon.value;
       // 앞쪽 뒷쪽 공백 제거
       temp = temp.trim();
       // 추후 업데이트 예정(정규표현식-문자열체크 문법)
@@ -40,15 +39,7 @@ export default {
         // json 저장 문자열
 
         //{completed:false, title:메모내용, icon:파일명 ....}
-        let memoTemp = {
-          id: getCurrentDate(),
-          complete: false,
-          memotitle : newItem.value
-        };
-
-        //추후 실제 DB 연동 예정
-        localStorage.setItem(memoTemp.id, JSON.stringify(memoTemp));   
-        
+        context.emit('additem',temp,icon)
         resetItem(); 
       }     
     }
@@ -57,10 +48,13 @@ export default {
     const resetItem = () => {
       newItem.value = '';
     }
-
+  const addIcon = (index) => {
+    newIcon.value = index;
+  }
     return  {
       newItem,
-      addItem
+      addItem,
+      addIcon
     }
   }
 }
@@ -85,14 +79,19 @@ export default {
   outline: none;
 }
 .input-box {  
-  width: 70%;
+  width: calc(93%  - 250px);
   font-size: 16px;
   margin-left: 20px;
 }
-
+.option{
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .add-bt {
-  display: block;
-  float:right;
+  display: inline-block;
+
   background-color: hotpink;
   cursor: pointer;  
 }
@@ -101,6 +100,38 @@ export default {
   vertical-align: middle;
   color: #fff;
   margin: 0 20px;
+}
+.img1:active,
+.img2:active,
+.img3:active{
+  border: 1px solid #000;
+}
+.img1{
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: url('@/assets/images/dog1.png') no-repeat center;
+  background-size: cover;
+  font-size: 0;
+  cursor: pointer;
+}
+.img2{
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: url('@/assets/images/dog2.png') no-repeat center;
+  background-size: cover;
+  font-size: 0;
+  cursor: pointer;
+}
+.img3{
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: url('@/assets/images/dog3.png') no-repeat center;
+  background-size: cover;
+  font-size: 0;
+  cursor: pointer;
 }
 
 
