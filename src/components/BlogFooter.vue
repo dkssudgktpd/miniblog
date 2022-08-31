@@ -6,11 +6,14 @@
 </template>
 
 <script>
+import {useStore} from 'vuex'
 export default {
-  setup(props, context){
+  setup(){
+    const store = useStore();
     const clearAllMemo = () =>{
-
-      context.emit('deleteitem')
+      // context.emit('deleteitem')
+      // store.commit('CLEAR_MEMO');
+      store.dispatch('fetchClearMemo');
     }
 
     return{
@@ -39,6 +42,12 @@ cursor: pointer;
 border: 1px solid hotpink;
 border-radius: 5px;
 margin: 10px;
+transition: background-color 0.5s;
+}
+.clear-all-bt:hover{
+  background-color: hotpink;
+  color: #fff;
+  border: 1px solid #000;
 }
 .copy{
 display: block;

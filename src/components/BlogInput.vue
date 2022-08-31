@@ -15,15 +15,33 @@
       <i class="fas fa-plus add-bt-icon"></i>
     </span>
     </div>
+
+    <!-- 안내창 -->
+    <ModalView :show="showModal" @closemodal="showModal=false">
+      <template #header>
+        <h3>안내창</h3>
+      </template>
+      <template #body>
+        <h2>마 내용 입력해라 ㅡㅡ</h2>
+      </template>
+    </ModalView>
+
   </div>
 </template>
 
 <script>
 import {ref} from 'vue';
+import ModalView from '@/components/common/ModalView.vue';
+import {useStore} from 'vuex';
 export default {
-  setup(props, context) {
+  components:{
+    ModalView,
+  },
+  setup() {
+    const store = useStore();
     const newItem = ref('');
     const newIcon = ref(0);
+    const showModal = ref(false);
     const addItem = () => {  
       let temp = newItem.value;
       let icon = newIcon.value;
@@ -32,16 +50,13 @@ export default {
       // 추후 업데이트 예정(정규표현식-문자열체크 문법)
       //  공백 '' 공백 '' 공백 앞,뒷자리 공백을 없애야함
       if(temp !== '') {
-        //localStorage.setItem(키, 값)
-        // 값은 추후에 json 형태로 만들어서 저장
-        // JSON.stringify(오브젝트)
-        //localStorage.setItem(키, json 문자열로 저장)
-        // json 저장 문자열
-
-        //{completed:false, title:메모내용, icon:파일명 ....}
-        context.emit('additem',temp,icon)
-        resetItem(); 
-      }     
+        // context.emit('additem',temp,icon)
+        // store.commit('ADD_MEMO',{item:temp, index:icon});
+        store.dispatch('fetchAddMemo', {item:temp, index:icon})
+        resetItem();
+      }else{
+        showModal.value = true;
+      }
     }
     
     // 내용 재설정
@@ -54,7 +69,8 @@ export default {
     return  {
       newItem,
       addItem,
-      addIcon
+      addIcon,
+      showModal,
     }
   }
 }
